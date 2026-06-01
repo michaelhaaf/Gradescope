@@ -24,21 +24,24 @@ class Gradescope:
         self,
         username: str | None = None,
         password: str | None = None,
+        url: str = BASE_URL,
         auto_login: bool = True,
         verbose: bool = False,
     ) -> None:
-        '''
+        f'''
         Initializes a Gradescope object.
 
         Args:
             username (str | None): The username for logging into Gradescope. Defaults to None.
             password (str | None): The password for logging into Gradescope. Defaults to None.
+            url (str): The url for logging into Gradescope. Defaults to {BASE_URL}.
             auto_login (bool): Whether to automatically login upon object initialization. Defaults to True.
             verbose (bool): Whether to enable verbose logging. Defaults to False.
         '''
         self.session = requests.session()
         self.username = username
         self.password = password
+        self.url = url
         self.verbose = verbose
         self.logged_in = False
 
@@ -72,7 +75,7 @@ class Gradescope:
         if self.username is None or self.password is None:
             raise TypeError('The username or password cannot be None.')
 
-        response = self.session.get(BASE_URL)
+        response = self.session.get(self.url)
         self._response_check(response)
         soup = BeautifulSoup(response.text, 'html.parser')
         token_input = soup.find('input', attrs={'name': 'authenticity_token'})
@@ -91,7 +94,7 @@ class Gradescope:
             'commit': 'Log In',
             'session[remember_me_sso]': 0,
         }
-        response = self.session.post(LOGIN_URL, data=data)
+        response = self.session.post(LOGIN_URL.format(BASE_URL=self.url), data=data)
         self._response_check(response)
 
         log.info(f'[Login] Current URL: {response.url}')
@@ -133,7 +136,7 @@ class Gradescope:
         if not self.logged_in:
             raise NotLoggedInError
 
-        response = self.session.get(BASE_URL)
+        response = self.session.get(self.url)
         self._response_check(response)
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -218,7 +221,7 @@ class Gradescope:
         if not self.logged_in:
             raise NotLoggedInError
 
-        response = self.session.get(course.get_url() + '/assignments')
+        response = self.session.get(urljoin(self.url, course.url + '/assignments'))
         self._response_check(response)
         soup = BeautifulSoup(response.text, 'html.parser')
         assignments_data = soup.find('div', {'data-react-class': 'AssignmentsTable'})
@@ -293,7 +296,7 @@ class Gradescope:
         if not self.logged_in:
             raise NotLoggedInError
 
-        response = self.session.get(course.get_url())
+        response = self.session.get(urljoin(self.url, course.url))
         self._response_check(response)
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -387,7 +390,7 @@ class Gradescope:
         if not self.logged_in:
             raise NotLoggedInError
 
-        response = self.session.get(course.get_url() + '/memberships')
+        response = self.session.get(urljoin(self.url, course.url + '/memberships'))
         self._response_check(response)
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -448,7 +451,7 @@ class Gradescope:
         if url is None:
             return None
 
-        response = self.session.get(urljoin(BASE_URL, url + PAST_SUBMISSIONS))
+        response = self.session.get(urljoin(self.url, url + PAST_SUBMISSIONS))
         self._response_check(response)
         json_data = json.loads(response.text)['past_submissions']
 
@@ -484,7 +487,7 @@ class Gradescope:
         if not self.logged_in:
             raise NotLoggedInError
 
-        url = GRADEBOOK.format(course_id=course.course_id, member_id=member.member_id)
+        url = GRADEBOOK.format(BASE_URL=self.url, course_id=course.course_id, member_id=member.member_id)
         response = self.session.get(url)
         self._response_check(response)
         return json.loads(response.text)
@@ -505,7 +508,7 @@ class Gradescope:
         if not self.logged_in:
             raise NotLoggedInError
 
-        response = self.session.get(assignment.get_grades_url())
+        response = self.session.get(urljoin(self.url, assignment.url + "/scores.csv"))
         self._response_check(response)
         return pd.read_csv(io.StringIO(response.content.decode('utf-8')), skiprows=2)
 

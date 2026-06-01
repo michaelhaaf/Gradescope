@@ -2,8 +2,8 @@ from enum import Enum
 
 
 BASE_URL = 'https://www.gradescope.com'
-LOGIN_URL = f'{BASE_URL}/login'
-GRADEBOOK = 'https://www.gradescope.com/courses/{course_id}/gradebook.json?user_id={member_id}'
+LOGIN_URL = '{BASE_URL}/login'
+GRADEBOOK = '{BASE_URL}/courses/{course_id}/gradebook.json?user_id={member_id}'
 PAST_SUBMISSIONS = '.json?content=react&only_keys%5B%5D=past_submissions'
 
 
