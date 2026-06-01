@@ -510,7 +510,7 @@ class Gradescope:
 
         response = self.session.get(urljoin(self.url, assignment.url + "/scores.csv"))
         self._response_check(response)
-        return pd.read_csv(io.StringIO(response.content.decode('utf-8')), skiprows=2)
+        return pd.read_csv(io.StringIO(response.content.decode('utf-8')))
 
     def download_file(self, path: str, url: str) -> None:
         '''
