@@ -60,7 +60,7 @@ def load_csv(path: str) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def save_csv(path: str, dataframe: pd.DataFrame, index: bool = False) -> None:
+def save_csv(path: str, dataframe: pd.DataFrame, index: bool = False, sep: str=",") -> None:
     '''
     Save DataFrame data to a CSV file.
 
@@ -68,8 +68,9 @@ def save_csv(path: str, dataframe: pd.DataFrame, index: bool = False) -> None:
         path: The path to save the CSV file.
         dataframe: The DataFrame to be saved.
         index: Whether to include the index in the CSV file (default is False).
+        sep: The separator for the csv file (default is ',').
 
     Returns:
         None
     '''
-    dataframe.to_csv(path, index=index)
+    dataframe.to_csv(path, index=index, sep=sep)
