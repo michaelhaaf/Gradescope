@@ -34,3 +34,14 @@ dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools.packages.find]
 include = ["gradescope*"]
+
+[dependency-groups]
+dev = [
+    "commitizen>=3.9.1",
+    "ruff>=0.15.15",
+]
+
+[tool.ruff]
+exclude = [
+    "*",
+]
